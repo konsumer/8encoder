@@ -129,7 +129,6 @@ class M58Encoder:
 if __name__ == '__main__':
   import board
   import busio
-  from time import sleep
 
   m5e = M58Encoder(busio.I2C(board.SCL, board.SDA))
 
@@ -141,9 +140,11 @@ if __name__ == '__main__':
 
   c = 0
   while True:
-    sleep(0.1)
     c = c + 1
     for i in range(8):
       b=m5e.is_button_down(i)
       r=m5e.get_encoder_value(i)
-      m5e.set_led_color_hsv(i, i * 0.125, 1, (m5e.get_encoder_value(i) % 127) / 127)
+      if m5e.is_button_down(i):
+        m5e.set_led_color_int(i, 0xffffff)
+      else:
+        m5e.set_led_color_hsv(i, i * 0.125, 1, (m5e.get_encoder_value(i) % 127) / 127)
