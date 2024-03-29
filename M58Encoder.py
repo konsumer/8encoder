@@ -30,8 +30,10 @@ class M58Encoder:
     return int.from_bytes(self.read_bytes(reg, bytearray(4)), "little")
 
   def write_bytes(self, reg, value):
-    self.i2c.writeto(self.address, bytes([reg]) + value)
-
+    try:
+      self.i2c.writeto(self.address, bytes([reg]) + value)
+    except OSError:
+      pass
   def write_int(self, reg, value):
     self.write_bytes(reg, bytes(ctypes.c_int32(value)))
 
