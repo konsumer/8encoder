@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include "m_pd.h"
 #include "pigpio-8encoder.h"
 
@@ -39,12 +40,12 @@ static void pi8encoder_bang(t_pi8encoder* x) {
     x->initialised = true;
   }
 
-  t_atom values[17];
+  t_atom values[17] = {0};
   SETFLOAT(&values[0], pigio_8encoder_get_switch_value(x->i2c));
 
   for (int i = 0; i < 8; i++) {
-    SETFLOAT(&values[i + 1], pigio_8encoder_is_button_down(x->i2c, i) ? 1 : 0);
-    SETFLOAT(&values[i + 8], pigio_8encoder_get_encoder_value(x->i2c, i));
+    SETFLOAT(&values[i + 1], pigio_8encoder_is_button_down(x->i2c, i) ? 1.0 : 0.0);
+    SETFLOAT(&values[i + 9], pigio_8encoder_get_encoder_value(x->i2c, i));
   }
 
   // Output all values as a list
@@ -59,16 +60,16 @@ static void* pi8encoder_new() {
   return x;
 }
 
-void pi8encoder_handle_rgb(t_pi_gpio* x, t_floatarg r, t_floatarg g, t_floatarg b) {
-  post("RGB %f, %f, %f", r, g, b);
+void pi8encoder_handle_rgb(t_pi8encoder* x, t_floatarg i, t_floatarg r, t_floatarg g, t_floatarg b) {
+  pigio_8encoder_set_led_color_rgb(x->i2c, i, r, g, b);
 }
 
-void pi8encoder_handle_hsv(t_pi_gpio* x, t_floatarg h, t_floatarg s, t_floatarg v) {
-  post("HSV %f, %f, %f", h, s, v);
+void pi8encoder_handle_hsv(t_pi8encoder* x, t_floatarg i, t_floatarg h, t_floatarg s, t_floatarg v) {
+  pigio_8encoder_set_led_color_hsv(x->i2c, i, h, s, v);
 }
 
-void pi8encoder_handle_rotary(t_pi_gpio* x, t_floatarg value) {
-  post("Rotary %f", value);
+void pi8encoder_handle_rotary(t_pi8encoder* x, t_floatarg i, t_floatarg value) {
+  pigio_8encoder_set_encoder_value(x->i2c, i, value);
 }
 
 void pi8encoder_setup(void) {
@@ -86,6 +87,7 @@ void pi8encoder_setup(void) {
       A_DEFFLOAT,
       A_DEFFLOAT,
       A_DEFFLOAT,
+      A_DEFFLOAT,
       0);
   class_addmethod(
       pi8encoder_class,
@@ -94,11 +96,13 @@ void pi8encoder_setup(void) {
       A_DEFFLOAT,
       A_DEFFLOAT,
       A_DEFFLOAT,
+      A_DEFFLOAT,
       0);
   class_addmethod(
       pi8encoder_class,
       (t_method)pi8encoder_handle_rotary,
       gensym("rotary"),
+      A_DEFFLOAT,
       A_DEFFLOAT,
       0);
 
