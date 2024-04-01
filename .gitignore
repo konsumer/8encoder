@@ -55,3 +55,4 @@ dkms.conf
 ._*
 wiringpi-8encoder/test
 pigpio-8encoder/test
+*.pd_linux
