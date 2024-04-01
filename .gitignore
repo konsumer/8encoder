@@ -54,3 +54,4 @@ dkms.conf
 .DS_Store
 ._*
 wiringpi-8encoder/test
+pigpio-8encoder/test

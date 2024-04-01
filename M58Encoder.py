@@ -87,13 +87,6 @@ class M58Encoder:
     red = (val >> 16) & 0xff
     self.set_led_color_rgb(index, red, green, blue)
 
-  def set_led_color_hls(self, index, h, l, s):
-    """
-    Set the RGB LED (0-7) color using seperate 0-1 floats for H, L, S
-    """
-    r, g, b = hls_to_rgb(h, l, s)
-    self.set_led_color_rgb(index, int(r * 0xff), int(g * 0xff), int(b * 0xff))
-
   def set_led_color_hsv(self, index, h, s, v):
     """
     Set the RGB LED (0-7) color using seperate 0-1 floats for H, S, V

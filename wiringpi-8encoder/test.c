@@ -11,9 +11,8 @@ int main(int argc, char* argv[]) {
 
   printf("Firmware version: %d\nAddress: 0x%.2x\n", wiringpi_8encoder_get_firmware_version(fd), wiringpi_8encoder_get_address(fd));
 
-  wiringpi_8encoder_set_led_color_int(fd, 0, 0xff0000);
-  wiringpi_8encoder_set_led_color_int(fd, 1, 0x00ff00);
-  wiringpi_8encoder_set_led_color_int(fd, 2, 0x0000ff);
+  // TODO: this does not work!
+  wiringpi_8encoder_set_led_color_rgb(fd, 0, 255, 0, 0);
 
   int i;
 
