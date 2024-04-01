@@ -4,7 +4,7 @@
 #X obj 194 144 loadbang;
 #X obj 194 215 print WARNING;
 #X msg 194 173 pi8encoder is running in emulator-mode. Make sure to compile it.;
-#X obj 319 121 print;
+#X obj 319 121 print pdencoder;
 #X connect 1 0 5 0;
 #X connect 2 0 4 0;
 #X connect 4 0 3 0;
