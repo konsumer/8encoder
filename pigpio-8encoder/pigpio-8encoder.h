@@ -163,10 +163,9 @@ void pigio_8encoder_set_led_color_rgb(int i2c, uint8_t index, uint8_t r, uint8_t
 }
 
 void pigio_8encoder_set_led_color_int(int i2c, uint8_t index, uint32_t color) {
-  uint8_t r = (color >> 16) & 0xff;
-  uint8_t g = (color >> 8) & 0xff;
-  uint8_t b = color & 0xff;
-  pigio_8encoder_set_led_color_rgb(i2c, index, r, g, b);
+  uint8_t a[3];
+  memcpy(a, &color, 3);
+  pigio_8encoder_set_led_color_rgb(i2c, index, a[0], a[1], a[2]);
 }
 
 void pigio_8encoder_set_led_color_hsv(int i2c, uint8_t index, float h, float s, float v) {
