@@ -15,7 +15,7 @@ static void pi8encoder_free(t_pi8encoder* x) {
   gpioTerminate();
   x->initialised = false;
   i2cClose(x->i2c);
-  post("[pi8encoder] pigpio terminated");
+  post("[pi8encoder] terminated");
 }
 
 static void pi8encoder_bang(t_pi8encoder* x) {
@@ -35,7 +35,7 @@ static void pi8encoder_bang(t_pi8encoder* x) {
 
     x->i2c = i2cOpen(1, ENCODER_ADDR, 0);
 
-    post("[pi8encoder] pigpio initialised.");
+    post("[pi8encoder] initialised.");
 
     x->initialised = true;
   }
