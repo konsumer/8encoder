@@ -13,8 +13,10 @@
 #define FIRMWARE_VERSION_REG 0xFE
 #define I2C_ADDRESS_REG 0xFF
 
-// convert array of 4 uint8 to 1 uint32
-uint32_t uint8s_to_32(uint8_t v4[4]);
+typedef union {
+  unsigned int integer;
+  unsigned char byte[4];
+} pigio_8encoder_i32;
 
 // HSV is 0-1 floats, returns single uint32
 uint32_t hsvToRgbInt(float h, float s, float v);
@@ -125,21 +127,24 @@ bool pigio_8encoder_is_button_down(int i2c, uint8_t index) {
 
 int pigio_8encoder_get_encoder_value(int i2c, uint8_t index) {
   i2cWriteByte(i2c, ENCODER_REG + (index * 4));
-  uint8_t a[4] = {
-      i2cReadByte(i2c),
-      i2cReadByte(i2c),
-      i2cReadByte(i2c),
-      i2cReadByte(i2c)};
-  return uint8s_to_32(a);
+  pigio_8encoder_i32 a;
+  a.byte[0] = i2cReadByte(i2c);
+  a.byte[1] = i2cReadByte(i2c);
+  a.byte[2] = i2cReadByte(i2c);
+  a.byte[3] = i2cReadByte(i2c);
+  return a.integer;
 }
 
 void pigio_8encoder_set_encoder_value(int i2c, uint8_t index, int32_t value) {
-  i2cWriteByte(i2c, ENCODER_REG + (index * 4));
-  uint8_t a[4];
-  memcpy(a, &value, 4);
-  for (int i = 0; i < 4; i++) {
-    i2cWriteByte(i2c, a[i]);
-  }
+  pigio_8encoder_i32 i;
+  i.integer = value;
+  uint8_t a[5] = {
+      ENCODER_REG + (index * 4),
+      i.byte[0],
+      i.byte[1],
+      i.byte[2],
+      i.byte[3]};
+  i2cWriteDevice(i2c, a, 5);
 }
 
 uint8_t pigio_8encoder_get_switch_value(int i2c) {

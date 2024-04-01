@@ -6,7 +6,7 @@ int main(int argc, char* argv[]) {
     printf("Error: pigpio init failed\n");
   }
 
-  int i2c = i2cOpen(1, 0x41, 0);
+  int i2c = i2cOpen(1, ENCODER_ADDR, 0);
 
   if (i2c < 0) {
     printf("Error: ");

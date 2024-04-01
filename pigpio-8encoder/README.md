@@ -1,0 +1,8 @@
+This is a single-header C library for using [pigpio](https://abyz.me.uk/rpi/pigpio/).
+
+
+You will need pigpio, which I installed like this:
+
+```
+sudo apt install libpigpio-dev
+```
