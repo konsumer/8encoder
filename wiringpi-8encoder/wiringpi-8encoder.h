@@ -4,84 +4,7 @@
 #include <stdint.h>
 #include <wiringPi.h>
 #include "wiringPiI2C_fork.h"
-
-// convert array of 4 uint8 to 1 uint32
-uint32_t uint8s_to_32(uint8_t v4[4]) {
-  return v4[0] | (v4[1] << 8) | (v4[2] << 16) | (v4[3] << 24);
-}
-
-// HSV is 0-1 floats, returns single uint32
-uint32_t hsvToRgbInt(float h, float s, float v) {
-  uint8_t hsv[3] = {0};
-
-  float cnum = 1.0 / 255.0;
-
-  hsv[0] = (uint8_t)(h * cnum);
-  hsv[1] = (uint8_t)(s * cnum);
-  hsv[2] = (uint8_t)(v * cnum);
-
-  uint8_t rgb[4] = {0};
-  uint8_t region, remainder, p, q, t;
-
-  if (hsv[1] == 0) {
-    rgb[0] = hsv[2];
-    rgb[1] = hsv[2];
-    rgb[2] = hsv[2];
-    return uint8s_to_32(rgb);
-  }
-
-  region = hsv[0] / 43;
-  remainder = (hsv[0] - (region * 43)) * 6;
-
-  p = (hsv[2] * (255 - hsv[1])) >> 8;
-  q = (hsv[2] * (255 - ((hsv[1] * remainder) >> 8))) >> 8;
-  t = (hsv[2] * (255 - ((hsv[1] * (255 - remainder)) >> 8))) >> 8;
-
-  switch (region) {
-    case 0:
-      rgb[0] = hsv[2];
-      rgb[1] = t;
-      rgb[2] = p;
-      break;
-    case 1:
-      rgb[0] = q;
-      rgb[1] = hsv[2];
-      rgb[2] = p;
-      break;
-    case 2:
-      rgb[0] = p;
-      rgb[1] = hsv[2];
-      rgb[2] = t;
-      break;
-    case 3:
-      rgb[0] = p;
-      rgb[1] = q;
-      rgb[2] = hsv[2];
-      break;
-    case 4:
-      rgb[0] = t;
-      rgb[1] = p;
-      rgb[2] = hsv[2];
-      break;
-    default:
-      rgb[0] = hsv[2];
-      rgb[1] = p;
-      rgb[2] = q;
-      break;
-  }
-
-  return uint8s_to_32(rgb);
-}
-
-#define ENCODER_ADDR 0x41
-#define ENCODER_REG 0x00
-#define INCREMENT_REG 0x20
-#define BUTTON_REG 0x50
-#define SWITCH_REG 0x60
-#define RGB_LED_REG 0x70
-#define RESET_COUNTER_REG 0x40
-#define FIRMWARE_VERSION_REG 0xFE
-#define I2C_ADDRESS_REG 0xFF
+#include "../shared.h"
 
 // Check to see if a rotary pushbutton (0-7) is pressed
 bool wiringpi_8encoder_is_button_down(uint8_t fd, uint8_t index) {
@@ -128,7 +51,7 @@ void wiringpi_8encoder_set_led_color_int(uint8_t fd, uint8_t index, uint32_t col
 
 // Set the RGB LED (0-7) color using seperate 0-1 floats for H, S, V
 void wiringpi_8encoder_set_led_color_hsv(uint8_t fd, uint8_t index, float h, float s, float v) {
-  uint32_t color = hsvToRgbInt(h, s, v);
+  uint32_t color = hsv_to_rgb_int(h, s, v);
   wiringpi_8encoder_set_led_color_int(fd, index, color);
 }
 

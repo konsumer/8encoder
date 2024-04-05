@@ -2,16 +2,7 @@
 #include <pigpio.h>
 #include <stdbool.h>
 #include <string.h>
-
-#define ENCODER_ADDR 0x41
-#define ENCODER_REG 0x00
-#define INCREMENT_REG 0x20
-#define BUTTON_REG 0x50
-#define SWITCH_REG 0x60
-#define RGB_LED_REG 0x70
-#define RESET_COUNTER_REG 0x40
-#define FIRMWARE_VERSION_REG 0xFE
-#define I2C_ADDRESS_REG 0xFF
+#include "../shared.h"
 
 typedef union {
   unsigned int integer;
@@ -58,67 +49,9 @@ uint8_t pigio_8encoder_get_address(int i2c);
 // Reset a counter (by index: 0-7)
 void pigio_8encoder_reset_counter(int i2c, uint8_t index);
 
+// define this, if you just want to use this as a header
 #ifndef NO_PIGPIO_8ENCODER_IMPLEMENTATION
 
-uint32_t uint8s_to_32(uint8_t v[4]) {
-  return v[0] | (v[1] << 8) | (v[2] << 16) | (v[3] << 24);
-}
-
-uint32_t hsvToRgbInt(float h, float s, float v) {
-  uint8_t hsv[3] = {(uint8_t)(h * 255.0), (uint8_t)(s * 255.0), (uint8_t)(v * 255.0)};
-
-  uint8_t rgb[4] = {0};
-  uint8_t region, remainder, p, q, t;
-
-  if (hsv[1] == 0) {
-    rgb[0] = hsv[2];
-    rgb[1] = hsv[2];
-    rgb[2] = hsv[2];
-    return uint8s_to_32(rgb);
-  }
-
-  region = hsv[0] / 43;
-  remainder = (hsv[0] - (region * 43)) * 6;
-
-  p = (hsv[2] * (255 - hsv[1])) >> 8;
-  q = (hsv[2] * (255 - ((hsv[1] * remainder) >> 8))) >> 8;
-  t = (hsv[2] * (255 - ((hsv[1] * (255 - remainder)) >> 8))) >> 8;
-
-  switch (region) {
-    case 0:
-      rgb[0] = hsv[2];
-      rgb[1] = t;
-      rgb[2] = p;
-      break;
-    case 1:
-      rgb[0] = q;
-      rgb[1] = hsv[2];
-      rgb[2] = p;
-      break;
-    case 2:
-      rgb[0] = p;
-      rgb[1] = hsv[2];
-      rgb[2] = t;
-      break;
-    case 3:
-      rgb[0] = p;
-      rgb[1] = q;
-      rgb[2] = hsv[2];
-      break;
-    case 4:
-      rgb[0] = t;
-      rgb[1] = p;
-      rgb[2] = hsv[2];
-      break;
-    default:
-      rgb[0] = hsv[2];
-      rgb[1] = p;
-      rgb[2] = q;
-      break;
-  }
-
-  return uint8s_to_32(rgb);
-}
 
 bool pigio_8encoder_is_button_down(int i2c, uint8_t index) {
   i2cWriteByte(i2c, BUTTON_REG + index);
@@ -174,7 +107,7 @@ void pigio_8encoder_set_led_color_int(int i2c, uint8_t index, uint32_t color) {
 }
 
 void pigio_8encoder_set_led_color_hsv(int i2c, uint8_t index, float h, float s, float v) {
-  uint32_t color = hsvToRgbInt(h, s, v);
+  uint32_t color = hsv_to_rgb_int(h, s, v);
   pigio_8encoder_set_led_color_int(i2c, index, color);
 }
 
