@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include "m_pd.h"
-#include "pigpio-8encoder.h"
+#include "linux-8encoder.h"
 
 static t_class* pi8encoder_class;
 
@@ -41,11 +41,11 @@ static void pi8encoder_bang(t_pi8encoder* x) {
   }
 
   t_atom values[17] = {0};
-  SETFLOAT(&values[0], pigio_8encoder_get_switch_value(x->i2c));
+  SETFLOAT(&values[0], linux_8encoder_get_switch_value(x->i2c));
 
   for (int i = 0; i < 8; i++) {
-    SETFLOAT(&values[i + 1], pigio_8encoder_is_button_down(x->i2c, i) ? 1.0 : 0.0);
-    SETFLOAT(&values[i + 9], pigio_8encoder_get_encoder_value(x->i2c, i));
+    SETFLOAT(&values[i + 1], linux_8encoder_is_button_down(x->i2c, i) ? 1.0 : 0.0);
+    SETFLOAT(&values[i + 9], linux_8encoder_get_encoder_value(x->i2c, i));
   }
 
   // Output all values as a list
@@ -61,15 +61,15 @@ static void* pi8encoder_new() {
 }
 
 void pi8encoder_handle_rgb(t_pi8encoder* x, t_floatarg i, t_floatarg r, t_floatarg g, t_floatarg b) {
-  pigio_8encoder_set_led_color_rgb(x->i2c, i, r, g, b);
+  linux_8encoder_set_led_color_rgb(x->i2c, i, r, g, b);
 }
 
 void pi8encoder_handle_hsv(t_pi8encoder* x, t_floatarg i, t_floatarg h, t_floatarg s, t_floatarg v) {
-  pigio_8encoder_set_led_color_hsv(x->i2c, i, h, s, v);
+  linux_8encoder_set_led_color_hsv(x->i2c, i, h, s, v);
 }
 
 void pi8encoder_handle_rotary(t_pi8encoder* x, t_floatarg i, t_floatarg value) {
-  pigio_8encoder_set_encoder_value(x->i2c, i, value);
+  linux_8encoder_set_encoder_value(x->i2c, i, value);
 }
 
 void pi8encoder_setup(void) {
