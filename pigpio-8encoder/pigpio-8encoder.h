@@ -9,6 +9,15 @@ typedef union {
   unsigned char byte[4];
 } pigio_8encoder_i32;
 
+#define ENCODER_ADDR 0x41
+#define INCREMENT_REG 0x20
+#define BUTTON_REG 0x50
+#define SWITCH_REG 0x60
+#define RGB_LED_REG 0x70
+#define RESET_COUNTER_REG 0x40
+#define FIRMWARE_VERSION_REG 0xFE
+#define I2C_ADDRESS_REG 0xFF
+
 // HSV is 0-1 floats, returns single uint32
 uint32_t hsvToRgbInt(float h, float s, float v);
 
