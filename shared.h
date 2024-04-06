@@ -79,3 +79,4 @@ uint32_t hsv_to_rgb_int(float h, float s, float v) {
 
   return uint8s_to_32(rgb);
 }
+
