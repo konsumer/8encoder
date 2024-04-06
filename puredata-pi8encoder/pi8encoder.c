@@ -29,7 +29,7 @@ static void* pi8encoder_new() {
 
 static void pi8encoder_bang(t_pi8encoder* x) {
   t_atom msg[17] = {0};
-  int v = linux_8encoder_get_switch(x->i2c);
+  int v = linux_8encoder_switch(x->i2c);
   SETFLOAT(&msg[16], v);
   for (int i = 0; i < 8; i++) {
     v = linux_8encoder_get_counter(x->i2c, i);
