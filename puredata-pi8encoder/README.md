@@ -11,16 +11,13 @@ Also check out [pdpigpio](https://github.com/nullpainter/pdpigpio), as it uses s
 params: none
 
 inlet 1:
-  bang - get all values (as individual messages)
-  rotary X - get the value of rotary X
-  button X - get the value of button X
-  switch - get the value of switch
-  set rotary X Y - set value of X rotary to Y 
-  set rgb X R G B - set color of X LED (RGB range is 0-255)
-  set hsv X H S V - set color of X LED (HSV range is float 0-1)
+  bang - get values
+  rotary X Y - set value of X rotary to Y 
+  rgb X R G B - set color of X LED (RGB range is 0-255)
+  hsv X H S V - set color of X LED (HSV range is float 0-1)
 
 outlet 1:
-  rotary X Y - the value of rotary X is Y
-  button X Y - the value of button X is Y (0/1)
-  switch Y   - the value of toggle switch is Y (0/1)
+  R1 R2 R3 R4 R5 R6 R7 R8 | B1 B2 B3 B4 B5 B6 B7 B8 | SW
 ```
+
+All values are output as a single message.

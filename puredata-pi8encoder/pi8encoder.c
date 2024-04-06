@@ -1,74 +1,61 @@
 #include <stdlib.h>
-#include "m_pd.h"
 #include "linux-8encoder.h"
+#include "m_pd.h"
 
 static t_class* pi8encoder_class;
 
 typedef struct _pi8encoder {
   t_object x_obj;
   t_outlet* x_out;
-  bool initialised;
   int i2c;
 } t_pi8encoder;
 
 static void pi8encoder_free(t_pi8encoder* x) {
   gpioTerminate();
   x->initialised = false;
-  i2cClose(x->i2c);
   post("[pi8encoder] terminated");
-}
-
-static void pi8encoder_bang(t_pi8encoder* x) {
-  if (!x->initialised) {
-    if (geteuid() != 0) {
-      pd_error(x, "[pi8encoder] root is required to use this external");
-      exit(0);
-    }
-
-    // Use PWM for timing DMA transfers, as PCM is used for audio
-    // gpioCfgClock(5, 0, 0);
-
-    if (gpioInitialise() < 0) {
-      pd_error(x, "[pi8encoder] Unable to initialise GPIO; ensure pi8encoderd isn't running");
-      exit(0);
-    }
-
-    x->i2c = i2cOpen(1, ENCODER_ADDR, 0);
-
-    post("[pi8encoder] initialised.");
-
-    x->initialised = true;
-  }
-
-  t_atom values[17] = {0};
-  SETFLOAT(&values[0], linux_8encoder_get_switch_value(x->i2c));
-
-  for (int i = 0; i < 8; i++) {
-    SETFLOAT(&values[i + 1], linux_8encoder_is_button_down(x->i2c, i) ? 1.0 : 0.0);
-    SETFLOAT(&values[i + 9], linux_8encoder_get_encoder_value(x->i2c, i));
-  }
-
-  // Output all values as a list
-  outlet_list(x->x_out, 0, 17, values);
 }
 
 static void* pi8encoder_new() {
   t_pi8encoder* x = (t_pi8encoder*)pd_new(pi8encoder_class);
-  x->initialised = false;
   x->x_out = outlet_new(&x->x_obj, gensym("list"));
-
+  x->i2c = open("/dev/i2c-1", O_RDWR);
+  if (x->i2c < 0 || ioctl(x->i2c, I2C_SLAVE, ENCODER_ADDR) < 0) {
+    post("[pi8encoder] init error.");
+    // TODO: how to return error here, so it fails?
+    return NULL;
+  }
+  post("[pi8encoder] initialised.");
   return x;
 }
 
-void pi8encoder_handle_rgb(t_pi8encoder* x, t_floatarg i, t_floatarg r, t_floatarg g, t_floatarg b) {
-  linux_8encoder_set_led_color_rgb(x->i2c, i, r, g, b);
+static void pi8encoder_bang(t_pi8encoder* x) {
+  t_atom msg[17] = {0};
+  SETFLOAT(msg[16], linux_8encoder_switch(x->i2c));
+  for (int i = 0; i < 8; i++) {
+    SETFLOAT(&msg[i], linux_8encoder_get_counter(x->i2c, i));
+    SETFLOAT(&msg[i + 8], linux_8encoder_button_down(x->i2c, i + 8) ? 1 : 0);
+  }
+  outlet_list(x->x_out, 0, 17, msg);
 }
 
-void pi8encoder_handle_hsv(t_pi8encoder* x, t_floatarg i, t_floatarg h, t_floatarg s, t_floatarg v) {
-  linux_8encoder_set_led_color_hsv(x->i2c, i, h, s, v);
+static void pi8encoder_handle_rgb(t_pi8encoder* x, t_floatarg i, t_floatarg r, t_floatarg g, t_floatarg b) {
+  ColorRGB c = {0};
+  c.r = r;
+  c.g = g;
+  c.b = b;
+  linux_8encoder_set_led_color_rgb(x->i2c, i, c);
 }
 
-void pi8encoder_handle_rotary(t_pi8encoder* x, t_floatarg i, t_floatarg value) {
+static void pi8encoder_handle_hsv(t_pi8encoder* x, t_floatarg i, t_floatarg h, t_floatarg s, t_floatarg v) {
+  ColorHSV c = {0};
+  c.h = h;
+  c.s = s;
+  c.v = v;
+  linux_8encoder_set_led_color_hsv(x->i2c, i, c);
+}
+
+static void pi8encoder_handle_rotary(t_pi8encoder* x, t_floatarg i, t_floatarg value) {
   linux_8encoder_set_encoder_value(x->i2c, i, value);
 }
 
