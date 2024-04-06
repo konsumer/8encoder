@@ -11,8 +11,6 @@ typedef struct _pi8encoder {
 } t_pi8encoder;
 
 static void pi8encoder_free(t_pi8encoder* x) {
-  gpioTerminate();
-  x->initialised = false;
   post("[pi8encoder] terminated");
 }
 
@@ -31,10 +29,13 @@ static void* pi8encoder_new() {
 
 static void pi8encoder_bang(t_pi8encoder* x) {
   t_atom msg[17] = {0};
-  SETFLOAT(msg[16], linux_8encoder_switch(x->i2c));
+  int v = linux_8encoder_get_switch(x->i2c);
+  SETFLOAT(&msg[16], v);
   for (int i = 0; i < 8; i++) {
-    SETFLOAT(&msg[i], linux_8encoder_get_counter(x->i2c, i));
-    SETFLOAT(&msg[i + 8], linux_8encoder_button_down(x->i2c, i + 8) ? 1 : 0);
+    v = linux_8encoder_get_counter(x->i2c, i);
+    SETFLOAT(&msg[i], v);
+    v = linux_8encoder_button_down(x->i2c, i + 8) ? 1 : 0;
+    SETFLOAT(&msg[i + 8], v);
   }
   outlet_list(x->x_out, 0, 17, msg);
 }
@@ -44,7 +45,7 @@ static void pi8encoder_handle_rgb(t_pi8encoder* x, t_floatarg i, t_floatarg r, t
   c.r = r;
   c.g = g;
   c.b = b;
-  linux_8encoder_set_led_color_rgb(x->i2c, i, c);
+  linux_8encoder_set_led_rgb(x->i2c, i, c);
 }
 
 static void pi8encoder_handle_hsv(t_pi8encoder* x, t_floatarg i, t_floatarg h, t_floatarg s, t_floatarg v) {
@@ -52,11 +53,11 @@ static void pi8encoder_handle_hsv(t_pi8encoder* x, t_floatarg i, t_floatarg h, t
   c.h = h;
   c.s = s;
   c.v = v;
-  linux_8encoder_set_led_color_hsv(x->i2c, i, c);
+  linux_8encoder_set_led_hsv(x->i2c, i, c);
 }
 
 static void pi8encoder_handle_rotary(t_pi8encoder* x, t_floatarg i, t_floatarg value) {
-  linux_8encoder_set_encoder_value(x->i2c, i, value);
+  linux_8encoder_set_counter(x->i2c, i, value);
 }
 
 void pi8encoder_setup(void) {
