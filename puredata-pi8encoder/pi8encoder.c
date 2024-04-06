@@ -34,7 +34,7 @@ static void pi8encoder_bang(t_pi8encoder* x) {
   for (int i = 0; i < 8; i++) {
     v = linux_8encoder_get_counter(x->i2c, i);
     SETFLOAT(&msg[i], v);
-    v = linux_8encoder_button_down(x->i2c, i + 8) ? 1 : 0;
+    v = linux_8encoder_button_down(x->i2c, i) ? 1 : 0;
     SETFLOAT(&msg[i + 8], v);
   }
   outlet_list(x->x_out, 0, 17, msg);
