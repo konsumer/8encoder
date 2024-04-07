@@ -7,13 +7,13 @@ Shared header for utils that are used by all C implementations, for various driv
 #pragma once
 
 // TODO: do I really need all these?
-#include <stdint.h>
-#include <stdbool.h>
-#include <unistd.h>
-#include <string.h>
 #include <fcntl.h>
-#include <sys/ioctl.h>
+#include <stdbool.h>
+#include <stdint.h>
 #include <stdio.h>
+#include <string.h>
+#include <sys/ioctl.h>
+#include <unistd.h>
 
 // convert 4 uint8_t to uint32_t
 uint32_t uint8s_to_32(uint8_t v[4]) {
@@ -83,7 +83,6 @@ typedef struct {
   uint8_t b;
 } ColorRGB;
 
-
 typedef struct {
   float h;
   float s;
@@ -100,8 +99,8 @@ bool i2c_get_register_val(int i2c, uint8_t reg, void* out_pntr, uint8_t len) {
   if (read(i2c, out_pntr, len) != len) {
     return false;
   }
-  // 1us pause helps with missing messages
-  usleep(1);
+  // 10us pause helps with missing messages
+  usleep(10);
   return true;
 }
 
@@ -109,13 +108,13 @@ bool i2c_get_register_val(int i2c, uint8_t reg, void* out_pntr, uint8_t len) {
 bool i2c_set_register_val(int i2c, uint8_t reg, void* in_ptr, uint8_t len) {
   uint8_t msg[33] = {0};
   msg[0] = reg;
-  memcpy(msg+1, in_ptr, len);
-  
-  if (write(i2c, msg, len+1) != (len+1)) {
+  memcpy(msg + 1, in_ptr, len);
+
+  if (write(i2c, msg, len + 1) != (len + 1)) {
     return false;
   }
 
-  // 1us pause helps with missing messages
-  usleep(1);
+  // 100us pause helps with missing messages
+  usleep(100);
   return true;
 }
