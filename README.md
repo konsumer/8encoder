@@ -2,7 +2,7 @@
 
 Various libs for working with [an i2c 8 rotary-encoder thing](https://docs.m5stack.com/en/unit/8Encoder) on a pi.
 
-- [linux-8encoder](linux-8encoder) - This is the recommended lib for working in C. Just uses regular linux stuff.
+- [linux-8encoder](linux-8encoder) - C lib. Just uses regular linux stuff.
 - [puredata-pi8encoder](puredata-pi8encoder) - Puredata extension that use linux-8encoder
 - [M58Encoder.py](M58Encoder.py) - Python library for use in circuitpython/adafruit-blinka
 
