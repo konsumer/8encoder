@@ -15,6 +15,11 @@ Make sure to add this to your `/boot/firmware/config.txt`:
 dtparam=i2c_arm=on,i2c_arm_baudrate=1000000
 ```
 
+## TODO
+
+- Have a look [here](https://github.com/giuliomoro/OSC2OLED4Bela) for a pretty complete i2c OLED driver. This idea shoudl work for all 3 (OLED, 4encoder, 8encoder)
+
+
 ## Not Complete
 
 - [wiringpi-8encoder](wiringpi-8encoder) - [wirinpi](https://github.com/WiringPi/WiringPi) single-header C library. Having a few issues with different message-formats (see [#212](https://github.com/WiringPi/WiringPi/issues/212)) They are wokring on adding mroe, so this might be a nice way to do it, later.
