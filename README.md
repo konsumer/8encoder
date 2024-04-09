@@ -1,5 +1,9 @@
 # 8encoder
 
+> [!WARNING]  
+> I ended up consolidating these into a single repo at [pipd](https://github.com/konsumer/pipd).
+
+
 Various libs for working with [an i2c 8 rotary-encoder thing](https://docs.m5stack.com/en/unit/8Encoder) on a pi.
 
 - [linux-8encoder](linux-8encoder) - C lib. Just uses regular linux stuff.
